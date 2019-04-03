@@ -1,10 +1,10 @@
 # Тестовое задание на вакансию java разработчика
 Используемые технологии:
--	Java 8
--	Spring, Hibernate по желанию
--	Maven или Gradle
--	Tomcat 8 или Jetty
--	PostgresSQL 9.6
+-	Java 8-11
+-	Spring (Spring boot), Hibernate по желанию
+-	Maven
+-	Tomcat или Jetty
+-	PostgresSQL 10
 -	Html 5\CSS
 
 1)	Необходимо написать импортер данных из файла test_case.csv в базу данных PostgreSQL. Структуру можно использовать такую же как в файле. 
