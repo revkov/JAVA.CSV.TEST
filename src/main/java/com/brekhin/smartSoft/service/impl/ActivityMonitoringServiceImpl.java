@@ -13,10 +13,10 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ActivityMonitoringServiceImpl implements ActivityMonitoringService {
@@ -59,6 +59,19 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public Map<String, BigInteger> get5FrequentlyUsedForms() {
+        List<List<Object>> frequentlyUsedForms = activityMonitoringRepository.get5FrequentlyUsedForms();
+        Map<String, BigInteger> map = new HashMap<>();
+
+        for(List<Object> x : frequentlyUsedForms) {
+            map.put((String)x.get(0), (BigInteger)x.get(1));
+            LOG.info("\n" + x.get(0) + (x.get(1)).toString());
+        }
+        
+        return map;
     }
 
     public LocalDateTime getDateFromString(String date) {

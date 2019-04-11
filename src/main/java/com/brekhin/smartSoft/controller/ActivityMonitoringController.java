@@ -1,22 +1,37 @@
 package com.brekhin.smartSoft.controller;
 
 import com.brekhin.smartSoft.service.ActivityMonitoringService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import java.math.BigInteger;
+import java.util.Map;
+import java.util.Set;
+
+@RestController
 public class ActivityMonitoringController {
     private ActivityMonitoringService activityMonitoringService;
 
+    private static Logger log = LoggerFactory.getLogger(ActivityMonitoringController.class);
     @Autowired
     public ActivityMonitoringController(ActivityMonitoringService activityMonitoringService) {
         this.activityMonitoringService = activityMonitoringService;
     }
 
     @GetMapping(path = "/")
-    public String loadData(){
+    public String loadData() {
         activityMonitoringService.saveActivityMonitoringDataToDB();
         return "OK!";
+    }
+
+    @GetMapping(path = "/topForms")
+    public String getTopForms(Model model){
+        Map<String, BigInteger> frequentlyUsedForms = activityMonitoringService.get5FrequentlyUsedForms();
+        return "OK";
     }
 }

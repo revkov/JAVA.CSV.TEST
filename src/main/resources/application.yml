@@ -9,7 +9,7 @@ spring:
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
       dialect: org.hibernate.dialect.PostgreSQL10Dialect
     show-sql: true
     properties.hibernate.temp.use_jdbc_metadata_defaults: false
