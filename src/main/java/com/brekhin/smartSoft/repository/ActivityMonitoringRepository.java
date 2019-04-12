@@ -21,4 +21,9 @@ public interface ActivityMonitoringRepository extends JpaRepository<ActivityMoni
             "desc limit 5",
             nativeQuery = true)
     List<List<Object>> get5FrequentlyUsedForms();
+
+    @Query(value = "select *\n" +
+            "from activity_monitoring\n" +
+            "order by ts asc", nativeQuery = true)
+    List<ActivityMonitoring> findAllOrderByTs();
 }

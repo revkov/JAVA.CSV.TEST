@@ -34,4 +34,10 @@ public class ActivityMonitoringController {
         Map<String, BigInteger> frequentlyUsedForms = activityMonitoringService.get5FrequentlyUsedForms();
         return "OK";
     }
+
+    @GetMapping(path = "/activity")
+    public String getActivity(){
+        activityMonitoringService.getActivity()
+        return "OK";
+    }
 }

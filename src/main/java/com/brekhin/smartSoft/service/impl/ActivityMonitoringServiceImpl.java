@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -32,11 +30,10 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
     @Override
     public void saveActivityMonitoringDataToDB() {
         LinkedList<ActivityMonitoring> acmList = new LinkedList<>();
-        int count = 0;
+
         try (CSVReader reader = new CSVReader(new FileReader("src/main/resources/test_case.csv"), ';', '"', 1)) {
             String[] data;
             while ((data = reader.readNext()) != null) {
-                count++;
                 if (data != null) {
                     ActivityMonitoring activityMonitoring = new ActivityMonitoring()
                             .setSsoid(data[0])
@@ -66,12 +63,37 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
         List<List<Object>> frequentlyUsedForms = activityMonitoringRepository.get5FrequentlyUsedForms();
         Map<String, BigInteger> map = new HashMap<>();
 
-        for(List<Object> x : frequentlyUsedForms) {
-            map.put((String)x.get(0), (BigInteger)x.get(1));
+        for (List<Object> x : frequentlyUsedForms) {
+            map.put((String) x.get(0), (BigInteger) x.get(1));
             LOG.info("\n" + x.get(0) + (x.get(1)).toString());
         }
-        
+
         return map;
+    }
+
+    @Override
+    public Map<String, String> getActivity() {
+        List<ActivityMonitoring> monitoringList = activityMonitoringRepository.findAllOrderByTs();
+        HashMap<String, List<String>> personActivity = new HashMap<>();
+        Map<String, String> userActivity = new HashMap<>();
+        for (ActivityMonitoring am : monitoringList) {
+            if (!personActivity.containsKey(am.getSsoid())) {
+                personActivity.put(am.getSsoid(), new ArrayList<>());
+                personActivity.get(am.getSsoid()).add(am.getSubtype());
+            } else {
+                personActivity.get(am.getSsoid()).add(am.getSubtype());
+            }
+        }
+
+        for (String s : personActivity.keySet()) {
+            List<String> strings = personActivity.get(s);
+            if (!strings.contains("success")) {
+                userActivity.put(s, strings.get(strings.size() - 1));
+                LOG.info("USER WITH ID: " + s + " STOPPED ON STEP:" + strings.get(strings.size() - 1));
+            }
+        }
+
+        return userActivity;
     }
 
     public LocalDateTime getDateFromString(String date) {
