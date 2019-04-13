@@ -6,3 +6,8 @@ services:
 before_script:
   - psql -c "CREATE DATABASE test_case;" -U postgres
   - psql -c "CREATE USER migrator WITH PASSWORD 'postgres';" -U postgres
+script:
+  - mvn clean package
+deploy:
+  provider: heroku
+  api_key: "00fdf09e-e6ed-4dcb-b6a1-98c5868f3048"
