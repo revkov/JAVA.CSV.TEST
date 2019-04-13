@@ -10,6 +10,7 @@ import com.brekhin.smartSoft.to.out.FormsUsedInLastHourTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,6 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
     @Override
     public List<IFrequentlyUsedFormsTOProjection> get5FrequentlyUsedForms() {
         List<IFrequentlyUsedFormsTOProjection> frequentlyUsedForms = activityMonitoringRepository.get5FrequentlyUsedForms();
-        LOG.info("\nSIZE(get5FrequentlyUsedForms):" + frequentlyUsedForms.size() + "\n");
         return frequentlyUsedForms;
     }
 
@@ -98,39 +98,38 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
             }
         }
 
-        LOG.info("\nSIZE(getFormsUsedInLastHour):" + result.size() + "\n");
-
         return result;
     }
 
     @Override
     @Cacheable("acm")
-    public List<ActivityInterruptedTO> getInterruptedActivities(Pageable pageable) {
+    public PagedListHolder getInterruptedActivities(int page, int size) {
 
         List<ActivityMonitoringEntity> monitoringList = activityMonitoringRepository.findAllOrderByTs();
-        HashMap<String, List<String>> personActivity = new HashMap<>();
-        List<ActivityInterruptedTO> userActivity = new ArrayList<>();
+        HashMap<String, List<String>> personActivityListStep = new HashMap<>();
+        List<ActivityInterruptedTO> interruptedActivities = new ArrayList<>();
 
         for (ActivityMonitoringEntity am : monitoringList) {
-            if (!personActivity.containsKey(am.getSsoid())) {
-                personActivity.put(am.getSsoid(), new ArrayList<>());
-                personActivity.get(am.getSsoid()).add(am.getSubtype());
+            if (!personActivityListStep.containsKey(am.getSsoid())) {
+                personActivityListStep.put(am.getSsoid(), new ArrayList<>());
+                personActivityListStep.get(am.getSsoid()).add(am.getSubtype());
             } else {
-                personActivity.get(am.getSsoid()).add(am.getSubtype());
+                personActivityListStep.get(am.getSsoid()).add(am.getSubtype());
             }
         }
 
-        for (String s : personActivity.keySet()) {
-            List<String> strings = personActivity.get(s);
+        for (String s : personActivityListStep.keySet()) {
+            List<String> strings = personActivityListStep.get(s);
             if (!strings.contains("success")) {
-                userActivity.add(new ActivityInterruptedTO(s, strings.get(strings.size() - 1)));
+                interruptedActivities.add(new ActivityInterruptedTO(s, strings.get(strings.size() - 1)));
             }
         }
 
-        int fromIndex = pageable.getPageNumber()* pageable.getPageSize();
-        int toIndex = fromIndex + pageable.getPageSize();
+        PagedListHolder pageResult = new PagedListHolder (interruptedActivities);
+        pageResult.setPage(page);
+        pageResult.setPageSize(size);
 
-        return userActivity.subList(fromIndex, toIndex);
+        return pageResult;
     }
 
 

@@ -5,6 +5,9 @@ import com.brekhin.smartSoft.service.ActivityMonitoringService;
 import com.brekhin.smartSoft.to.out.ActivityInterruptedTO;
 import com.brekhin.smartSoft.to.out.FormsUsedInLastHourTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,7 +27,7 @@ public class ActivityMonitoringController {
     }
 
     @GetMapping(path = "/topForms")
-    public String getTopForms(Model model){
+    public String getTopForms(Model model) {
         List<IFrequentlyUsedFormsTOProjection> frequentlyUsedForms = activityMonitoringService.get5FrequentlyUsedForms();
         model.addAttribute("frequentlyUsedForms", frequentlyUsedForms);
         return "topForms";
@@ -34,15 +37,19 @@ public class ActivityMonitoringController {
     public String getInterruptedActivities(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model){
-        List<ActivityInterruptedTO> interruptedActivities = activityMonitoringService
-                .getInterruptedActivities(PageRequest.of(page, size));
-        model.addAttribute("interruptedActivities", interruptedActivities);
+            Model model) {
+
+        PagedListHolder interruptedActivities = activityMonitoringService
+                .getInterruptedActivities(page, size);
+
+        model.addAttribute("url", "/activity");
+        model.addAttribute("page", interruptedActivities);
+
         return "interruptedActivity";
     }
 
     @GetMapping("/")
-    public String getLastAction(Model model){
+    public String getLastAction(Model model) {
         List<FormsUsedInLastHourTO> formsUsedInLastHour = activityMonitoringService
                 .getFormsUsedInLastHour();
         model.addAttribute("formsUsedInLastHour", formsUsedInLastHour);

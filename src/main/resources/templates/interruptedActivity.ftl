@@ -1,5 +1,5 @@
 <#import "common.ftl" as c>
-
+<#import "pagination.ftl" as p />
 
 <@c.page>
 <td>Вывести список пользователей, которые начали активность на форме и не дошли до конца</td>
@@ -12,7 +12,7 @@
     </tr>
     </thead>
     <tbody>
-    <#list interruptedActivities as el>
+    <#list page.getPageList() as el>
     <tr>
         <td>${el.getActivityMonitoring()}</td>
         <td>${el.getStep()}</td>
@@ -21,3 +21,4 @@
     </tbody>
 </table>
 </@c.page>
+<@p.pager url page />
