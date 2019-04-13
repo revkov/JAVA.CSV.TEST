@@ -10,6 +10,8 @@ import com.brekhin.smartSoft.to.out.FormsUsedInLastHourTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
@@ -70,6 +72,7 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
     }
 
     @Override
+    @Cacheable("am")
     public List<FormsUsedInLastHourTO> getFormsUsedInLastHour() {
 
         List<ActivityMonitoringEntity> all = activityMonitoringRepository.findAll();
@@ -90,7 +93,7 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
 
             long seconds = tempDateTime.until(toDateTime, ChronoUnit.SECONDS);
 
-            if (Math.abs(hours) * 60 + Math.abs(minutes) + (Math.abs(seconds) / 60) < 60) {
+            if (Math.abs(hours) * 60 + Math.abs(minutes) + Math.round(Math.abs(seconds) / 60) < 60) {
                 result.add(new FormsUsedInLastHourTO(actM.getSsoid(), actM.getFormid()));
             }
         }
@@ -101,6 +104,7 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
     }
 
     @Override
+    @Cacheable("acm")
     public List<ActivityInterruptedTO> getInterruptedActivities() {
         List<ActivityMonitoringEntity> monitoringList = activityMonitoringRepository.findAllOrderByTs();
         HashMap<String, List<String>> personActivity = new HashMap<>();

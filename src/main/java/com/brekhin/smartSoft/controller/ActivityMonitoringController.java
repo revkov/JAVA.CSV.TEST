@@ -5,10 +5,15 @@ import com.brekhin.smartSoft.service.ActivityMonitoringService;
 import com.brekhin.smartSoft.to.out.ActivityInterruptedTO;
 import com.brekhin.smartSoft.to.out.FormsUsedInLastHourTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.persistence.PrePersist;
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @Controller
@@ -20,6 +25,9 @@ public class ActivityMonitoringController {
         this.activityMonitoringService = activityMonitoringService;
         activityMonitoringService.saveActivityMonitoringDataToDB();
     }
+
+    //@PrePersist
+
 
     @GetMapping(path = "/topForms")
     public String getTopForms(Model model){
@@ -37,7 +45,8 @@ public class ActivityMonitoringController {
 
     @GetMapping("/")
     public String getLastAction(Model model){
-        List<FormsUsedInLastHourTO> formsUsedInLastHour = activityMonitoringService.getFormsUsedInLastHour();
+        List<FormsUsedInLastHourTO> formsUsedInLastHour = activityMonitoringService
+                .getFormsUsedInLastHour();
         model.addAttribute("formsUsedInLastHour", formsUsedInLastHour);
         return "home";
     }
