@@ -21,7 +21,7 @@ import java.util.*;
 @Service
 public class ActivityMonitoringServiceImpl implements ActivityMonitoringService {
 
-    private ActivityMonitoringRepository activityMonitoringRepository;
+    private final ActivityMonitoringRepository activityMonitoringRepository;
     private static Logger LOG = LoggerFactory.getLogger(ActivityMonitoringServiceImpl.class);
 
     @Autowired
@@ -67,7 +67,6 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
 
         for (List<Object> x : frequentlyUsedForms) {
             map.put((String) x.get(0), (BigInteger) x.get(1));
-            LOG.info("\n" + x.get(0) + (x.get(1)).toString());
         }
 
         return map;
@@ -94,12 +93,11 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
 
             long seconds = tempDateTime.until(toDateTime, ChronoUnit.SECONDS);
 
-            if (Math.abs(hours) * 60 + Math.abs(minutes) < 60) {
+            if (Math.abs(hours) * 60 + Math.abs(minutes) + (Math.abs(seconds) / 60) < 60) {
                 result.put(actM.getSsoid(), actM.getFormid());
             }
         }
 
-        LOG.info("\n SIZE:" + Integer.toString(result.size()) + "\n");
         return result;
     }
 
@@ -121,7 +119,6 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
             List<String> strings = personActivity.get(s);
             if (!strings.contains("success")) {
                 userActivity.put(s, strings.get(strings.size() - 1));
-                LOG.info("USER WITH ID: " + s + " STOPPED ON STEP:" + strings.get(strings.size() - 1));
             }
         }
 

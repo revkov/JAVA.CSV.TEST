@@ -15,9 +15,8 @@ import java.util.Set;
 
 @RestController
 public class ActivityMonitoringController {
-    private ActivityMonitoringService activityMonitoringService;
+    private final ActivityMonitoringService activityMonitoringService;
 
-    private static Logger log = LoggerFactory.getLogger(ActivityMonitoringController.class);
     @Autowired
     public ActivityMonitoringController(ActivityMonitoringService activityMonitoringService) {
         this.activityMonitoringService = activityMonitoringService;
