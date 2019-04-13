@@ -1,9 +1,12 @@
 package com.brekhin.smartSoft.service.impl;
 
 import au.com.bytecode.opencsv.CSVReader;
-import com.brekhin.smartSoft.model.ActivityMonitoring;
+import com.brekhin.smartSoft.model.ActivityMonitoringEntity;
+import com.brekhin.smartSoft.repository.projection.IFrequentlyUsedFormsTOProjection;
 import com.brekhin.smartSoft.repository.ActivityMonitoringRepository;
 import com.brekhin.smartSoft.service.ActivityMonitoringService;
+import com.brekhin.smartSoft.to.out.ActivityInterruptedTO;
+import com.brekhin.smartSoft.to.out.FormsUsedInLastHourTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -31,13 +33,13 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
 
     @Override
     public void saveActivityMonitoringDataToDB() {
-        LinkedList<ActivityMonitoring> acmList = new LinkedList<>();
+        LinkedList<ActivityMonitoringEntity> acmList = new LinkedList<>();
 
         try (CSVReader reader = new CSVReader(new FileReader("src/main/resources/test_case.csv"), ';', '"', 1)) {
             String[] data;
             while ((data = reader.readNext()) != null) {
                 if (data != null) {
-                    ActivityMonitoring activityMonitoring = new ActivityMonitoring()
+                    ActivityMonitoringEntity activityMonitoring = new ActivityMonitoringEntity()
                             .setSsoid(data[0])
                             .setTs(Long.parseLong(data[1]))
                             .setGrp(data[2])
@@ -61,23 +63,18 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
     }
 
     @Override
-    public Map<String, BigInteger> get5FrequentlyUsedForms() {
-        List<List<Object>> frequentlyUsedForms = activityMonitoringRepository.get5FrequentlyUsedForms();
-        Map<String, BigInteger> map = new HashMap<>();
-
-        for (List<Object> x : frequentlyUsedForms) {
-            map.put((String) x.get(0), (BigInteger) x.get(1));
-        }
-
-        return map;
+    public List<IFrequentlyUsedFormsTOProjection> get5FrequentlyUsedForms() {
+        List<IFrequentlyUsedFormsTOProjection> frequentlyUsedForms = activityMonitoringRepository.get5FrequentlyUsedForms();
+        LOG.info("\nSIZE(get5FrequentlyUsedForms):" + frequentlyUsedForms.size() + "\n");
+        return frequentlyUsedForms;
     }
 
     @Override
-    public Map<String, String> getFormsUsedInLastHour() {
+    public List<FormsUsedInLastHourTO> getFormsUsedInLastHour() {
 
-        List<ActivityMonitoring> all = activityMonitoringRepository.findAll();
-        Map<String, String> result = new HashMap<>();
-        for (ActivityMonitoring actM : all) {
+        List<ActivityMonitoringEntity> all = activityMonitoringRepository.findAll();
+        List<FormsUsedInLastHourTO> result = new ArrayList<>();
+        for (ActivityMonitoringEntity actM : all) {
             LocalDateTime toDateTime =
                     LocalDateTime.ofInstant(Instant.ofEpochSecond(actM.getTs()),
                             TimeZone.getDefault().toZoneId());
@@ -94,19 +91,22 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
             long seconds = tempDateTime.until(toDateTime, ChronoUnit.SECONDS);
 
             if (Math.abs(hours) * 60 + Math.abs(minutes) + (Math.abs(seconds) / 60) < 60) {
-                result.put(actM.getSsoid(), actM.getFormid());
+                result.add(new FormsUsedInLastHourTO(actM.getSsoid(), actM.getFormid()));
             }
         }
+
+        LOG.info("\nSIZE(getFormsUsedInLastHour):" + result.size() + "\n");
 
         return result;
     }
 
     @Override
-    public Map<String, String> getActivity() {
-        List<ActivityMonitoring> monitoringList = activityMonitoringRepository.findAllOrderByTs();
+    public List<ActivityInterruptedTO> getInterruptedActivities() {
+        List<ActivityMonitoringEntity> monitoringList = activityMonitoringRepository.findAllOrderByTs();
         HashMap<String, List<String>> personActivity = new HashMap<>();
-        Map<String, String> userActivity = new HashMap<>();
-        for (ActivityMonitoring am : monitoringList) {
+        List<ActivityInterruptedTO> userActivity = new ArrayList<>();
+
+        for (ActivityMonitoringEntity am : monitoringList) {
             if (!personActivity.containsKey(am.getSsoid())) {
                 personActivity.put(am.getSsoid(), new ArrayList<>());
                 personActivity.get(am.getSsoid()).add(am.getSubtype());
@@ -118,10 +118,11 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
         for (String s : personActivity.keySet()) {
             List<String> strings = personActivity.get(s);
             if (!strings.contains("success")) {
-                userActivity.put(s, strings.get(strings.size() - 1));
+                userActivity.add(new ActivityInterruptedTO(s, strings.get(strings.size() - 1)));
             }
         }
 
+        LOG.info("\n SIZE(getInterruptedActivities): " + Integer.toString(userActivity.size()) + "\n");
         return userActivity;
     }
 

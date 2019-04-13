@@ -2,11 +2,10 @@ package com.brekhin.smartSoft.model;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "activity_monitoring")
-public class ActivityMonitoring {
+public class ActivityMonitoringEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -33,7 +32,7 @@ public class ActivityMonitoring {
         return ssoid;
     }
 
-    public ActivityMonitoring setSsoid(String ssoid) {
+    public ActivityMonitoringEntity setSsoid(String ssoid) {
         this.ssoid = ssoid;
         return this;
     }
@@ -42,7 +41,7 @@ public class ActivityMonitoring {
         return ts;
     }
 
-    public ActivityMonitoring setTs(long ts) {
+    public ActivityMonitoringEntity setTs(long ts) {
         this.ts = ts;
         return this;
     }
@@ -51,7 +50,7 @@ public class ActivityMonitoring {
         return grp;
     }
 
-    public ActivityMonitoring setGrp(String grp) {
+    public ActivityMonitoringEntity setGrp(String grp) {
         this.grp = grp;
         return this;
     }
@@ -60,7 +59,7 @@ public class ActivityMonitoring {
         return type;
     }
 
-    public ActivityMonitoring setType(String type) {
+    public ActivityMonitoringEntity setType(String type) {
         this.type = type;
         return this;
     }
@@ -69,7 +68,7 @@ public class ActivityMonitoring {
         return subtype;
     }
 
-    public ActivityMonitoring setSubtype(String subtype) {
+    public ActivityMonitoringEntity setSubtype(String subtype) {
         this.subtype = subtype;
         return this;
     }
@@ -78,7 +77,7 @@ public class ActivityMonitoring {
         return url;
     }
 
-    public ActivityMonitoring setUrl(String url) {
+    public ActivityMonitoringEntity setUrl(String url) {
         this.url = url;
         return this;
     }
@@ -87,7 +86,7 @@ public class ActivityMonitoring {
         return orgid;
     }
 
-    public ActivityMonitoring setOrgid(String orgid) {
+    public ActivityMonitoringEntity setOrgid(String orgid) {
         this.orgid = orgid;
         return this;
     }
@@ -96,7 +95,7 @@ public class ActivityMonitoring {
         return code;
     }
 
-    public ActivityMonitoring setCode(String code) {
+    public ActivityMonitoringEntity setCode(String code) {
         this.code = code;
         return this;
     }
@@ -105,7 +104,7 @@ public class ActivityMonitoring {
         return formid;
     }
 
-    public ActivityMonitoring setFormid(String formid) {
+    public ActivityMonitoringEntity setFormid(String formid) {
         this.formid = formid;
         return this;
     }
@@ -114,7 +113,7 @@ public class ActivityMonitoring {
         return ltpa;
     }
 
-    public ActivityMonitoring setLtpa(String ltpa) {
+    public ActivityMonitoringEntity setLtpa(String ltpa) {
         this.ltpa = ltpa;
         return this;
     }
@@ -123,7 +122,7 @@ public class ActivityMonitoring {
         return sudirresponse;
     }
 
-    public ActivityMonitoring setSudirresponse(String sudirresponse) {
+    public ActivityMonitoringEntity setSudirresponse(String sudirresponse) {
         this.sudirresponse = sudirresponse;
         return this;
     }
@@ -132,7 +131,7 @@ public class ActivityMonitoring {
         return ymdh;
     }
 
-    public ActivityMonitoring setYmdh(LocalDateTime ymdh) {
+    public ActivityMonitoringEntity setYmdh(LocalDateTime ymdh) {
         this.ymdh = ymdh;
         return this;
     }

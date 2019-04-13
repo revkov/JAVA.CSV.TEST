@@ -1,18 +1,18 @@
 package com.brekhin.smartSoft.service;
 
-import com.brekhin.smartSoft.model.ActivityMonitoring;
+import com.brekhin.smartSoft.repository.projection.IFrequentlyUsedFormsTOProjection;
+import com.brekhin.smartSoft.to.out.ActivityInterruptedTO;
+import com.brekhin.smartSoft.to.out.FormsUsedInLastHourTO;
 
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 public interface ActivityMonitoringService {
 
     void saveActivityMonitoringDataToDB();
 
-    Map<String, BigInteger> get5FrequentlyUsedForms();
+    List<IFrequentlyUsedFormsTOProjection> get5FrequentlyUsedForms();
 
-    Map<String, String> getFormsUsedInLastHour();
+    List<FormsUsedInLastHourTO> getFormsUsedInLastHour();
 
-    Map<String, String>  getActivity();
+    List<ActivityInterruptedTO> getInterruptedActivities();
 }
