@@ -2,8 +2,8 @@ package com.brekhin.smartSoft.service.impl;
 
 import au.com.bytecode.opencsv.CSVReader;
 import com.brekhin.smartSoft.model.ActivityMonitoringEntity;
-import com.brekhin.smartSoft.repository.projection.IFrequentlyUsedFormsTOProjection;
 import com.brekhin.smartSoft.repository.ActivityMonitoringRepository;
+import com.brekhin.smartSoft.repository.projection.IFrequentlyUsedFormsTOProjection;
 import com.brekhin.smartSoft.service.ActivityMonitoringService;
 import com.brekhin.smartSoft.to.out.ActivityInterruptedTO;
 import com.brekhin.smartSoft.to.out.FormsUsedInLastHourTO;
@@ -105,7 +105,8 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
 
     @Override
     @Cacheable("acm")
-    public List<ActivityInterruptedTO> getInterruptedActivities() {
+    public List<ActivityInterruptedTO> getInterruptedActivities(Pageable pageable) {
+
         List<ActivityMonitoringEntity> monitoringList = activityMonitoringRepository.findAllOrderByTs();
         HashMap<String, List<String>> personActivity = new HashMap<>();
         List<ActivityInterruptedTO> userActivity = new ArrayList<>();
@@ -126,8 +127,10 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
             }
         }
 
-        LOG.info("\n SIZE(getInterruptedActivities): " + Integer.toString(userActivity.size()) + "\n");
-        return userActivity;
+        int fromIndex = pageable.getPageNumber()* pageable.getPageSize();
+        int toIndex = fromIndex + pageable.getPageSize();
+
+        return userActivity.subList(fromIndex, toIndex);
     }
 
 

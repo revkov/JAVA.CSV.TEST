@@ -3,6 +3,7 @@ package com.brekhin.smartSoft.service;
 import com.brekhin.smartSoft.repository.projection.IFrequentlyUsedFormsTOProjection;
 import com.brekhin.smartSoft.to.out.ActivityInterruptedTO;
 import com.brekhin.smartSoft.to.out.FormsUsedInLastHourTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -15,5 +16,5 @@ public interface ActivityMonitoringService {
 
     List<FormsUsedInLastHourTO> getFormsUsedInLastHour();
 
-    List<ActivityInterruptedTO> getInterruptedActivities();
+    List<ActivityInterruptedTO> getInterruptedActivities(Pageable pageable);
 }

@@ -6,14 +6,11 @@ import com.brekhin.smartSoft.to.out.ActivityInterruptedTO;
 import com.brekhin.smartSoft.to.out.FormsUsedInLastHourTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.persistence.PrePersist;
-import javax.websocket.server.PathParam;
 import java.util.List;
 
 @Controller
@@ -26,9 +23,6 @@ public class ActivityMonitoringController {
         activityMonitoringService.saveActivityMonitoringDataToDB();
     }
 
-    //@PrePersist
-
-
     @GetMapping(path = "/topForms")
     public String getTopForms(Model model){
         List<IFrequentlyUsedFormsTOProjection> frequentlyUsedForms = activityMonitoringService.get5FrequentlyUsedForms();
@@ -37,8 +31,12 @@ public class ActivityMonitoringController {
     }
 
     @GetMapping(path = "/activity")
-    public String getInterruptedActivities(Model model){
-        List<ActivityInterruptedTO> interruptedActivities = activityMonitoringService.getInterruptedActivities();
+    public String getInterruptedActivities(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model){
+        List<ActivityInterruptedTO> interruptedActivities = activityMonitoringService
+                .getInterruptedActivities(PageRequest.of(page, size));
         model.addAttribute("interruptedActivities", interruptedActivities);
         return "interruptedActivity";
     }
