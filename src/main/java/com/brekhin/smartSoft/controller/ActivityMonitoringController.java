@@ -37,7 +37,14 @@ public class ActivityMonitoringController {
 
     @GetMapping(path = "/activity")
     public String getActivity(){
-        activityMonitoringService.getActivity()
+        activityMonitoringService.getActivity();
         return "OK";
     }
+
+    @GetMapping(path="/lastAction")
+    public String getLastAction(){
+        activityMonitoringService.getFormsUsedInLastHour();
+        return "OK!";
+    }
+
 }

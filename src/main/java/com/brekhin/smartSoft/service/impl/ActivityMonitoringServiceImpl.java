@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -72,6 +74,36 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
     }
 
     @Override
+    public Map<String, String> getFormsUsedInLastHour() {
+
+        List<ActivityMonitoring> all = activityMonitoringRepository.findAll();
+        Map<String, String> result = new HashMap<>();
+        for (ActivityMonitoring actM : all) {
+            LocalDateTime toDateTime =
+                    LocalDateTime.ofInstant(Instant.ofEpochSecond(actM.getTs()),
+                            TimeZone.getDefault().toZoneId());
+            LocalDateTime fromDateTime = actM.getYmdh();
+
+            LocalDateTime tempDateTime = LocalDateTime.from(fromDateTime);
+
+            long hours = tempDateTime.until(toDateTime, ChronoUnit.HOURS);
+            tempDateTime = tempDateTime.minusHours(hours);
+
+            long minutes = tempDateTime.until(toDateTime, ChronoUnit.MINUTES);
+            tempDateTime = tempDateTime.minusMinutes(minutes);
+
+            long seconds = tempDateTime.until(toDateTime, ChronoUnit.SECONDS);
+
+            if (Math.abs(hours) * 60 + Math.abs(minutes) < 60) {
+                result.put(actM.getSsoid(), actM.getFormid());
+            }
+        }
+
+        LOG.info("\n SIZE:" + Integer.toString(result.size()) + "\n");
+        return result;
+    }
+
+    @Override
     public Map<String, String> getActivity() {
         List<ActivityMonitoring> monitoringList = activityMonitoringRepository.findAllOrderByTs();
         HashMap<String, List<String>> personActivity = new HashMap<>();
@@ -96,7 +128,8 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
         return userActivity;
     }
 
-    public LocalDateTime getDateFromString(String date) {
+
+    private LocalDateTime getDateFromString(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH");
         return LocalDateTime.parse(date, formatter);
     }

@@ -12,5 +12,7 @@ public interface ActivityMonitoringService {
 
     Map<String, BigInteger> get5FrequentlyUsedForms();
 
+    Map<String, String> getFormsUsedInLastHour();
+
     Map<String, String>  getActivity();
 }
