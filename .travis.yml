@@ -10,4 +10,6 @@ script:
   - mvn clean package
 deploy:
   provider: heroku
-  api_key: "00fdf09e-e6ed-4dcb-b6a1-98c5868f3048"
+  api_key:
+    secure: "00fdf09e-e6ed-4dcb-b6a1-98c5868f3048"
+  app: testcasesmartsoft
