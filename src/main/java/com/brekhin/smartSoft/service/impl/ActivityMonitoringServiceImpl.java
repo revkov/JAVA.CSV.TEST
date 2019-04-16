@@ -1,33 +1,30 @@
 package com.brekhin.smartSoft.service.impl;
 
-import au.com.bytecode.opencsv.CSVReader;
 import com.brekhin.smartSoft.model.ActivityMonitoringEntity;
 import com.brekhin.smartSoft.repository.ActivityMonitoringRepository;
 import com.brekhin.smartSoft.repository.projection.IFrequentlyUsedFormsTOProjection;
 import com.brekhin.smartSoft.service.ActivityMonitoringService;
 import com.brekhin.smartSoft.to.out.ActivityInterruptedTO;
 import com.brekhin.smartSoft.to.out.FormsUsedInLastHourTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.brekhin.smartSoft.util.CSVToEntityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.support.PagedListHolder;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
 public class ActivityMonitoringServiceImpl implements ActivityMonitoringService {
 
+    @Value("${file.name}")
+    private String fileName;
+
     private final ActivityMonitoringRepository activityMonitoringRepository;
-    private static Logger LOG = LoggerFactory.getLogger(ActivityMonitoringServiceImpl.class);
 
     @Autowired
     public ActivityMonitoringServiceImpl(ActivityMonitoringRepository activityMonitoringRepository) {
@@ -36,33 +33,8 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
 
     @Override
     public void saveActivityMonitoringDataToDB() {
-        LinkedList<ActivityMonitoringEntity> acmList = new LinkedList<>();
-
-        try (CSVReader reader = new CSVReader(new FileReader("src/main/resources/test_case.csv"), ';', '"', 1)) {
-            String[] data;
-            while ((data = reader.readNext()) != null) {
-                if (data != null) {
-                    ActivityMonitoringEntity activityMonitoring = new ActivityMonitoringEntity()
-                            .setSsoid(data[0])
-                            .setTs(Long.parseLong(data[1]))
-                            .setGrp(data[2])
-                            .setType(data[3])
-                            .setSubtype(data[4])
-                            .setUrl(data[5])
-                            .setOrgid(data[6])
-                            .setFormid(data[7])
-                            .setCode(data[8])
-                            .setLtpa(data[9])
-                            .setSudirresponse(data[10])
-                            .setYmdh(getDateFromString(data[11]));
-
-                    acmList.add(activityMonitoring);
-                }
-            }
-            activityMonitoringRepository.saveAll(acmList);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        LinkedList<ActivityMonitoringEntity> acmList = CSVToEntityUtil.convertCSVToEntitiesList(fileName);
+        activityMonitoringRepository.saveAll(acmList);
     }
 
     @Override
@@ -125,16 +97,10 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
             }
         }
 
-        PagedListHolder pageResult = new PagedListHolder (interruptedActivities);
+        PagedListHolder pageResult = new PagedListHolder(interruptedActivities);
         pageResult.setPage(page);
         pageResult.setPageSize(size);
 
         return pageResult;
-    }
-
-
-    private LocalDateTime getDateFromString(String date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH");
-        return LocalDateTime.parse(date, formatter);
     }
 }
