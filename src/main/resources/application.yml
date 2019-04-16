@@ -1,0 +1,18 @@
+server:
+  port: 33500
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: "jdbc:postgresql://localhost:5432/test_case"
+    username: postgres
+    password: "postgres"
+
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+      dialect: org.hibernate.dialect.PostgreSQL10Dialect
+    show-sql: false
+    properties.hibernate.temp.use_jdbc_metadata_defaults: false
+file:
+  name: "test_case.csv"
