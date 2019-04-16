@@ -33,7 +33,7 @@ public class ActivityMonitoringServiceImpl implements ActivityMonitoringService 
 
     @Override
     public void saveActivityMonitoringDataToDB() {
-        LinkedList<ActivityMonitoringEntity> acmList = CSVToEntityUtil.convertCSVToEntitiesList(fileName);
+        LinkedList<ActivityMonitoringEntity> acmList = CSVToEntityUtil.readCSVToListEntities(fileName);
         activityMonitoringRepository.saveAll(acmList);
     }
 

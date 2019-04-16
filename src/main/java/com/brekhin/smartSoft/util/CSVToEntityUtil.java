@@ -12,7 +12,7 @@ import java.util.LinkedList;
 
 public class CSVToEntityUtil {
 
-    public static LinkedList<ActivityMonitoringEntity> convertCSVToEntitiesList(String fileName) {
+    public static LinkedList<ActivityMonitoringEntity> readCSVToListEntities(String fileName) {
         LinkedList<ActivityMonitoringEntity> acmList = new LinkedList<>();
 
         Class clazz = CSVToEntityUtil.class;
